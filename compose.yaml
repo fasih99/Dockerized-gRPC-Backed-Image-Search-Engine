@@ -1,0 +1,22 @@
+services:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile-client
+      target: final
+    environment:
+      - SERVER_HOST=server:50051
+    depends_on:
+      - server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+      target: final
+    volumes:
+      - ./db:/db
+    ports:
+      - 50051:50051
+    expose:
+      - 50051
+

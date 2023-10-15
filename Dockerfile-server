@@ -1,0 +1,17 @@
+# Need grpc for build image;
+# I have created a grpc image so I don't have to compilethe entire grpc every time
+FROM kcpu/grpc-cxx AS build
+ADD src /src
+
+WORKDIR /src
+RUN mkdir build && cd build && cmake .. && make
+
+# smaller final image
+FROM debian:latest AS final
+
+# grab server executable from build
+COPY --from=build /src/build/server /bin/
+
+WORKDIR /db
+EXPOSE 50051
+CMD /bin/server
