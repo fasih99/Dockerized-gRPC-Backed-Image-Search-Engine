@@ -1,7 +1,7 @@
 # Need grpc for build image;
 # I have created a grpc image so I don't have to compilethe entire grpc every time
 FROM kcpu/grpc-cxx AS build
-ADD src /src
+ADD server /src
 
 WORKDIR /src
 RUN mkdir build && cd build && cmake .. && make

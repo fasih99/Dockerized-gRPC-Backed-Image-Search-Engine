@@ -12,7 +12,7 @@ sudo apt update && sudo apt install build-essential cmake
 
 Build client and server:
 ```
-mkdir -p src/build && cd src/build
+mkdir -p server/build && cd server/build
 cmake .. && make -j $(nproc)
 ```
 
