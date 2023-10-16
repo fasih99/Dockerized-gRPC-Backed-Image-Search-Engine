@@ -10,10 +10,19 @@ Install other dependencies:
 sudo apt update && sudo apt install build-essential cmake
 ```
 
-Build client and server:
+Build server:
 ```
-mkdir -p server/build && cd server/build
+mkdir -p src/server/build && cd src/server/build
 cmake .. && make -j $(nproc)
+```
+
+Build client:
+```
+cd src/client
+virtualenv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3 -m grpc_tools.protoc -I/src --python_out=. --pyi_out=. --grpc_python_out=. /src/project1.proto
 ```
 
 ## run client and server
@@ -23,7 +32,7 @@ In one terminal, run the server:
 ```
 In another terminal, use the client to make a search:
 ```
-./client -q <query> -o <outfile>
+./client.py -q <query> -o <outfile>
 ```
 Example:
 ```
