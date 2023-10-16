@@ -55,7 +55,7 @@ root@client1:/src# ./client.py -q <query> -o <outfile>
 root@client1:/src# ./client.py -q Q1 -o scrn.jpg
 ```
 
-![screenshot](db/screenshots/docker-compose-client-server.jpg)
+![screenshot](screenshots/docker-compose-client-server.jpg)
 
 # References
 * https://grpc.io/docs/languages/cpp/quickstart/
