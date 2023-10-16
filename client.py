@@ -3,20 +3,21 @@ import sys
 import getopt
 import grpc
 from project1_pb2 import Query
-from project1_pb2 import ImgSearchEngine
+from project1_pb2_grpc import ImgSearchEngine
+from project1_pb2_grpc import ImgSearchEngineStub
 
 def save_image(filename, bytes):
     with open(filename, "wb") as outfile:
         outfile.write(bytes)
 
 class Client:
+    stub = 0
     def __init__(self, channel):
-        self.stub = ImgSearchEngine.Stub(channel)
+        self.stub = ImgSearchEngineStub(channel)
 
     def make_query(self, query):
         request = Query(query=query)
-        context = grpc.aio.unary_unary_rpc_context()
-        img = self.stub.MakeQuery(request, context=context)
+        img = self.stub.MakeQuery(request)
         return img
 
 def main(argv):
