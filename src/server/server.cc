@@ -35,15 +35,24 @@ std::string searchImage(std::string query, int *len);        // search for and g
 std::string db_dir_path = "./";                         // default database dir
 std::string listen_addr = "0.0.0.0:50051";              // default listening address
 
+bool debug_mode = false;
+
 // gRPC service protocol class implementation
 class ImageSvc final : public ImgSearchEngine::Service {
+    int tid;
+    public:
+        void setTid(int id) { this->tid = id; }
     // make a search
     Status MakeQuery(ServerContext* context, const Query* request, 
         Image* reply) override {
+        
+        if(debug_mode)
+            std::cout << "thread ["<<this->tid<<"]: processing query " << request->query() << std::endl;
+
         int imglen = 0;
         // do search, grab image
         std::string image = searchImage(request->query(), &imglen);
-
+        
         // tell client about errors
         if(!image.compare("ENODB") || !image.compare("EFILEOPN"))
             reply->set_error(500);
@@ -145,6 +154,7 @@ void RunServer(int n) {
     ImageSvc service;
     ServerBuilder builder;
 
+    service.setTid(n);
     // Listen on the given address without any authentication mechanism.
     builder.AddListeningPort(listen_addr, grpc::InsecureServerCredentials());
 
@@ -153,7 +163,9 @@ void RunServer(int n) {
 
     // assemble the server.
     std::unique_ptr<Server> server(builder.BuildAndStart());
-    std::cout << "thread[" << n << "]: server listening on " << listen_addr << std::endl;
+
+    if(debug_mode)
+        std::cout << "thread[" << n << "]: server listening on " << listen_addr << std::endl;
 
     // wait indefinately for server
     server->Wait();
@@ -164,14 +176,15 @@ int main(int argc, char** argv) {
     std::vector<std::thread> threads;   // thread vector to keep track of them
 
     int option;
-    while((option = getopt(argc, argv, ":hHt:d:l:")) != -1){
+    while((option = getopt(argc, argv, ":hHxt:d:l:")) != -1){
         switch(option) {
             case 'h': case 'H':
                 std::cout << "Usage: " << argv[0] << "[options]" << std::endl \
                       << "   -h               - display this help" << std::endl \
                       << "   -t <num>         - specify number of server threads" << std::endl \
                       << "   -d /path/to/db   - specify db dir" << std::endl \
-                      << "   -l address:port  - listen on address:port" << std::endl;
+                      << "   -l address:port  - listen on address:port" << std::endl \
+                      << "   -x               - enable debug mode" << std::endl;
                 return 0;
                 break;
             case 'd':       // data dir
@@ -180,6 +193,9 @@ int main(int argc, char** argv) {
                     std::cout << argv[0] << ": error: invalid db dir" << std::endl;
                     return 1;
                 }
+                break;
+            case 'x':
+                debug_mode = true;
                 break;
             case 'l':       // listen address
                 listen_addr = optarg;
@@ -197,12 +213,13 @@ int main(int argc, char** argv) {
                 return 1;
         }
     }
-
     
     threads.resize(num_threads);
     for (int i = 0; i < num_threads; i++)
         threads.at(i) = std::thread(RunServer, i);
 
+    std::cout << "[main] Started " << num_threads << " server threads.\n";
+    
     // wait for threads to finish
     for (auto& t : threads)
         t.join();

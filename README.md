@@ -51,8 +51,8 @@ $ docker ps
 # find client (in my case proj1-client-1)
 
 $ docker exec -it proj1-client-1 bash
-root@client1:/work# client -q <query> -o <outfile>
-root@client1:/work# client -q Q1 -o scrn.jpg
+root@client1:/src# ./client.py -q <query> -o <outfile>
+root@client1:/src# ./client.py -q Q1 -o scrn.jpg
 ```
 
 ![screenshot](db/screenshots/docker-compose-client-server.jpg)

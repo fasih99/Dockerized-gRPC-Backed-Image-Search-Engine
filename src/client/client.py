@@ -56,7 +56,7 @@ def main(argv):
             outfile = arg
 
     if not query or not outfile:
-        print(sys.argv[0] + ": error: must specify query and outfile")
+        print(sys.argv[0] + ": error: must specify query and outfile.  use -h for help")
         sys.exit(1)
 
     # Create a gRPC channel
