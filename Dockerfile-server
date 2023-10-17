@@ -14,4 +14,4 @@ COPY --from=build /src/server/build/server /bin/
 
 WORKDIR /db
 EXPOSE 50051
-CMD /bin/server
+CMD /bin/server -x -t 5
